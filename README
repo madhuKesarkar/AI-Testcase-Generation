@@ -1,0 +1,197 @@
+# AI Test Case Generation
+
+AI-powered test case generation framework that listens for Jira/Linear events,
+generates test cases using GPT-4, validates them for duplicates, and maps/uploads
+the generated test cases to a target test management system such as Xray,
+TestRail, or Linear.
+
+## Overview
+
+The Flask application acts as the integration/orchestration layer between the
+source requirement, GPT-4, and the destination test management system.
+
+High-level flow:
+
+Jira / Linear
+      |
+      | Webhook event
+      v
+Flask Webhook Application
+      |
+      +-- Receive issue/story payload
+      |
+      +-- Read requirement and acceptance criteria
+      |
+      +-- Extract and map relevant fields
+      |
+      +-- Check existing test cases
+      |     |
+      |     +-- Detect potential duplicates
+      |
+      +-- Send requirement context to GPT-4
+      |     |
+      |     +-- Generate relevant test cases
+      |
+      +-- Validate generated test cases
+      |
+      +-- Apply destination field mapping
+      |
+      +-- Upload test cases
+      |     |
+      |     +-- Xray
+      |     +-- TestRail
+      |     +-- Linear
+      |
+      +-- Log/track generated and uploaded test cases
+
+
+## Workflow
+
+1. Create a story/issue in Jira or Linear.
+
+2. Add complete requirement information:
+   - Description
+   - Acceptance Criteria
+   - Supporting/reference documentation
+   - Other relevant context
+
+3. Update the issue/story label to:
+
+   `ready for QA`
+
+4. The configured webhook detects the event and sends the issue payload
+   to the Flask application.
+
+5. Run the Flask application:
+
+   ```bash
+   python jira_webhook.py
+
+
+6. The application:
+
+Reads the issue details
+Maps the required source fields
+Checks for existing/duplicate test cases
+Sends the requirement context to GPT-4
+Generates test cases
+Validates the generated output
+Maps the test cases to destination fields
+Uploads them to the configured target system
+Verify the generated test cases in the application console.
+Verify the uploaded test cases in the destination system.
+Validate:
+Generated test case count vs uploaded test case count
+Correct field mapping
+Duplicate test case handling
+Test case association with the correct source issue
+Local Webhook Testing with ngrok
+
+When running locally, the Flask application may be available at:
+
+http://localhost:5000
+
+External systems such as Jira cannot directly access localhost.
+
+ngrok can expose the local Flask server through a public HTTPS endpoint.
+
+Start the Flask application:
+
+```bash
+python jira_webhook.py
+
+Then start ngrok:
+```bash
+ngrok http 5000
+
+ngrok will provide a public URL similar to:
+
+https://abc123.ngrok-free.app
+
+Configure the Jira/Linear webhook to use the appropriate endpoint, for example:
+
+https://abc123.ngrok-free.app/webhook
+
+Configuration
+
+Environment-specific configuration should be maintained in .env.
+
+Example:
+</> env
+
+OPENAI_API_KEY=
+
+JIRA_URL=
+JIRA_EMAIL=
+JIRA_API_TOKEN=
+
+DESTINATION_SYSTEM=
+DESTINATION_URL=
+DESTINATION_API_TOKEN=
+
+# Destination field mappings
+SOURCE_ISSUE_FIELD=
+TEST_TITLE_FIELD=
+TEST_DESCRIPTION_FIELD=
+TEST_STEPS_FIELD=
+EXPECTED_RESULT_FIELD=
+
+Duplicate Validation
+
+Before uploading generated test cases, the application validates whether
+equivalent or matching test cases already exist in the destination.
+
+The goal is to prevent duplicate test case creation when the same requirement
+or webhook event is processed multiple times.
+
+Output Validation
+
+After generation and upload, validate:
+
+Number of test cases generated
+Number of test cases successfully uploaded
+Duplicate/skipped test cases
+Source issue to test case association
+Destination field mappings
+Generated test case content
+Dependencies
+
+Python dependencies should be maintained in:
+
+requirements.txt
+
+Generate/update it using:
+
+```bash
+pip freeze > requirements.txt
+
+```bash
+Install dependencies using:
+
+Generated Test Tracking
+
+Generated/uploaded test case information should be tracked separately from
+requirements.txt.
+
+For example:
+
+uploaded_issues.json
+
+This can capture information such as:
+
+Source issue ID
+Generated test case count
+Uploaded test case IDs
+Duplicate/skipped test cases
+Destination system
+Processing status
+Timestamp
+Future Enhancements
+Support Jira and Linear as configurable source systems
+Support Xray, TestRail, and Linear as destination systems
+Improve semantic duplicate detection
+Configurable field mapping
+MCP-based integrations
+Generation/upload audit history
+Retry handling for failed uploads
+Generation quality validation
