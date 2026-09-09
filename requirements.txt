@@ -1,0 +1,17 @@
+flask>=3.0
+python-dotenv>=1.0
+requests>=2.31
+
+# --- LangChain core (always needed) ---
+langchain>=0.3.0
+langchain-core>=0.3.0
+pydantic>=2.7
+numpy>=1.26
+
+# --- LLM providers: install the one(s) you use (see .env -> LLM_PROVIDER) ---
+# Free, fully local via Ollama (https://ollama.com):
+langchain-ollama>=0.2.0
+# Free tier, no credit card (https://aistudio.google.com/apikey):
+langchain-google-genai>=2.0.0
+# Paid:
+# langchain-openai>=0.2.0

@@ -1,0 +1,10 @@
+{
+  "issue": {
+    "key": "DEMO-1",
+    "fields": {
+      "summary": "User can log in with email and password",
+      "description": "As a registered user I want to log in using my email and password so that I can access my dashboard.\n\nAcceptance Criteria:\n- Valid credentials redirect to /dashboard.\n- Invalid password shows an inline error and stays on /login.\n- Empty email or password disables the Login button.\n- After 5 failed attempts the account is locked for 15 minutes.",
+      "labels": ["aitestcase"]
+    }
+  }
+}
